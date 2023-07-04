@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { catchError, Observable, of } from 'rxjs';
 
 import { Livro } from '../models/livro';
 import { LivrosService } from '../services/livros.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-livro',
@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 })
 export class LivroComponent implements OnInit {
 
-  livros: Observable<Livro[]>;
+  livros$: Observable<Livro[]>;
   displayedColumns = ['titulo','numeroDePaginas','nota','ativo'];
 
   //liveosService: LivrosService;
@@ -19,7 +19,12 @@ export class LivroComponent implements OnInit {
   constructor(private liveosService: LivrosService) {
 
     //this.liveosService = new LivrosService();
-    this.livros = this.liveosService.list();
+    this.livros$ = this.liveosService.list()
+    .pipe(
+      catchError(error => {
+        return of([])
+      }),
+    );
   }
 
   ngOnInit(): void {
